@@ -4,36 +4,59 @@ def generate_sequence(length):
     return [random.randint(1, 3) for _ in range(length)]
 
 def play_game(sequence):
-    player_score = 50
-    opponent_score = 50
+    player1_score = 50
+    player2_score = 50
 
     for num in sequence:
-        print("Tavs gājiens. Tava pašreizējā punktu skaits:", player_score)
-        choice = int(input("Izvēlies, kādu punktu skaitli izņemt (1, 2 vai 3): "))
-        if choice == 1:
-            player_score -= 1
-        elif choice == 2:
-            player_score -= 1
-            opponent_score -= 1
-        elif choice == 3:
-            opponent_score -= 1
+        print("Virkne:", sequence)
+        print("Spēlētāja 1 punkti:", player1_score)
+        print("Spēlētāja 2 punkti:", player2_score)
 
-        print("Pretinieka gājiens. Pretinieka pašreizējā punktu skaits:", opponent_score)
-        print()
+        current_player = 1
+        while True:
+            print("Nākamais gājiens:", "Spēlētājs 1" if current_player == 1 else "Spēlētājs 2")
+            choice = int(input("Izvēlieties ciparu ko noņemt (1-3): "))
 
-    if player_score == opponent_score:
-        return "Neizšķirts!"
-    elif player_score > opponent_score:
-        return "Tu uzvarēji!"
+            if choice < 1 or choice > 3:
+                print("Jūs izvēlaties nepareizo ciparu.5 Jāizvēlas cipars no 1 - 3!")
+            elif choice in sequence:
+                sequence.remove(choice)
+
+                if choice == 1:
+                    if current_player == 1:
+                        player1_score -= 1
+                    else:
+                        player2_score -= 1
+                elif choice == 2:
+                    player1_score -= 1
+                    player2_score -= 1
+                elif choice == 3:
+                    if current_player == 1:
+                        player2_score -= 1
+                    else:
+                        player1_score -= 1
+
+                break
+            else:
+                print("Cipars neatrodas virknē. Jāizvēlas cits cipars.")
+
+            current_player = 1 if current_player == 2 else 2
+
+    print("Spēle beidzās!")
+    print("Spēlētāja 1 punkti:", player1_score)
+    print("Spēlētāja 2 punkti:", player2_score)
+
+    if player1_score == player2_score:
+        print("Tas ir neizšķirts!")
+    elif player1_score > player2_score:
+        print("Spēlētājs 1 UZVAR!")
     else:
-        return "Tu zaudēji!"
+        print("Spēlētājs 2 UZVAR!")
 
 def main():
     length = random.randint(15, 25)
     sequence = generate_sequence(length)
-    result = play_game(sequence)
-    print("Spēles virkne:", sequence)
-    print("Rezultāts:", result)
+    play_game(sequence)
 
 if __name__ == "__main__":
     main()
