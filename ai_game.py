@@ -1,20 +1,49 @@
 import random
 
+class State:
+    def __init__(self, num_dict, A_B_score):
+        self.num_dict = num_dict
+        self.A_B_score = A_B_score
+        self.rating = 0
+
+    # Heiristiskā funkcija
+    def count_rating(self):
+        A_B_score = self.A_B_score
+        A_score = A_B_score["A"]
+        B_score = A_B_score["B"]
+        score_differ = A_score - B_score
+
+        num_dict = self.num_dict
+        one_count = 0
+        three_count = 0
+        for key in num_dict.keys():
+            value = num_dict[key]
+            if value == 1:
+                one_count += 1
+            elif value == 3:
+                three_count -= 1
+        
+        self.rating = one_count + three_count + score_differ
+
 # Value array generation
 
 def generate_array(len):
     value_array = {}
-    for i in range(len):
-        value = random.randint(1, 3)
-        value_array.update({(i+1):value})
 
-    # value_array = {
-    #   1: 3,
-    #   2: 2,
-    #   3: 3,
-    #   4: 1,
-    #   5: 2
-    # }
+    # Return from commenting:
+    # for i in range(len):
+    #     value = random.randint(1, 3)
+    #     value_array.update({(i+1):value})
+    #
+    
+    # Test array:
+    value_array = {
+      1: 3,
+      2: 2,
+      3: 3,
+      4: 1,
+      5: 2
+    }
 
     
     return value_array
@@ -35,11 +64,12 @@ def turn_action(A_or_B_turn, arr, score):
         print("\n"+ A_or_B_turn +" turn:" +"\n")
         keys = str(arr.keys())
         while True:
-            x = int(input("Enter one of these numbers " + keys[10:-1] + ": "))
-            if x not in arr.keys():
-                x = int(input("Enter one of these numbers " + keys[10:-1] + ": "))
-            else:
-                break
+            x = input("Enter one of these numbers " + keys[10:-1] + ": ")
+            if x.isdigit():
+                 x = int(x)
+                 if x in arr.keys():
+                    break
+
         arr_val = arr[x]
         match arr_val:
             case 1:
@@ -61,11 +91,13 @@ def turn_action(A_or_B_turn, arr, score):
                 else:
                     A -= 1
                 print_players_score(A,B)
+            case _:
+                print("\nChoose a number!\n")
         arr.pop(x)
-
+    if len(arr) > 0:
         arr_values = str(arr.values())
         print("\n You have number numbers: " + arr_values[12:-1])
-        
+
     score["A"] = A
     score["B"] = B
     return score
@@ -73,23 +105,28 @@ def turn_action(A_or_B_turn, arr, score):
 # Array length entering
 def enter_val_arr_len():
     while True:
-        # n = 5
-        # return n
-        n = int(input("Enter number from 15 to 25 how many values do you want in array: "))
-        if n < 15 or n > 25:
-            n = input("Enter number from 15 to 25 how many values do you want in array: ")
-        else:
-            return n
-
+        # Test length:
+        n = 5
+        return n
+    
+        # Return from commenting:
+        # n = input("Enter number from 15 to 25 how many values do you want in array: ")
+        # if n.isdigit():
+        #     n = int(n)
+        #     if 15 <= n <= 25:
+        #         return n
+        # print("Invalid input! Type a digit from 15 to 25.!")
+        # 
+    
 def analize_win(score):
     A = score["A"]
     B = score["B"]
     if A > B:
-        print("Player A is a winner! Congratulations!")
+        print("\nPlayer A is a winner! Congratulations!")
     elif A < B:
-        print("Player B is a winner! Congratulations!")
+        print("\nPlayer B is a winner! Congratulations!")
     else:
-        print("It's a DRAW! Good game players!")
+        print("\nIt's a DRAW! Good game players!")
 
 # Main part:
 def main():
@@ -100,7 +137,7 @@ def main():
     print("\n Array with numbers: " + val_arr_values[12:-1])
 
     A_B_scores = {"A":50,"B":50}
-    for i in range(len(value_array)):
+    for i in value_array:
         A_B_scores = turn_action("A",val_arr_copy, A_B_scores)
         A_B_scores = turn_action("B",val_arr_copy, A_B_scores)
     analize_win(A_B_scores)
