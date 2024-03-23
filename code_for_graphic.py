@@ -54,6 +54,7 @@ def print_players_score(A_score, B_score):
     print("Player's A score: " + str(A_score))
     print("Player's B score: " + str(B_score))
 
+# new part start
 # Choose who will start
 def choose_first():
     while True:
@@ -70,6 +71,7 @@ def choose_first():
             return first, second
         else:
             print("\nType Computer or Human!")
+# new part end
 
 # Player's score depending on the choise
 def turn_action(A_or_B_turn, arr, score):
