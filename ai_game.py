@@ -300,10 +300,6 @@ def run_game(screen):
 
     algorithm_choice = choose_algorithm(screen)
     print("Chosen algorithm:", algorithm_choice)
-    # if algorithm_choice == "MinMax":
-    #     selectMinMax(ind, True)
-    # elif algorithm_choice == "Alpha-beta":
-    #     selectAlphaBeta(ind, float('-inf'), float('inf'), True)
     square_rects = draw_squares(screen, game_array)
 
     running = True
@@ -445,7 +441,7 @@ def display_winner(screen, winner):
 # Main function
 def main():
     pygame.init()
-    WIDTH, HEIGHT = 800, 600
+    WIDTH, HEIGHT = 1000, 600
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Game")
 
@@ -460,7 +456,6 @@ def main():
     text_rect_exit = text_exit.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
 
     start_clicked = False
-    # exit_clicked = False
 
     while True:
         for event in pygame.event.get():
