@@ -1,5 +1,5 @@
-# Pirmais projekts MI
+## SVARĪGA INFORMĀCIJA!
 
-## Need to be downloaded
+Fails ai_game.py darbojas kopīgi ar ar failu tree_logic.py
 
-- pygame library
+Pirms spēles iedarbināšanas pārliecinieties, ka uzinstālētie faili atrodas vienā un tā pašā mapē!
