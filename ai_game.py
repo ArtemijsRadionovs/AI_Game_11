@@ -2,12 +2,14 @@ import pygame
 import sys
 import random
 from tree_logic import selectMinMax, selectAlphaBeta, growBranch, getInd, nodes
+import time
 
 # Static color variables
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 DARK_YELLOW = (255, 215, 0)
+PATH = []
 
 # Define Player class
 class Player:
@@ -22,7 +24,8 @@ def generate_array(length):
     for i in range(length):
         value = random.randint(1, 3)
         value_array.update({(i+1):value})
-    
+    print("Generated array:")
+    print(value_array)
     return value_array
 
 # Function to print players' scores
@@ -42,34 +45,6 @@ def display_turn(screen, current_player):
         text = font.render("Turn: Computer", True, BLACK)
     text_rect = text.get_rect(topright=(screen.get_width() - 20, 20))
     screen.blit(text, text_rect)
-
-
-# Function for player's turn
-def turn_action(current_player, arr, players):
-    if len(arr) > 0:
-        print(f"\n{current_player.name} turn:\n")
-        keys = str(arr.keys())
-        while True:
-            x = input(f"Enter one of these numbers {keys[10:-1]}: ")
-            if x.isdigit():
-                x = int(x)
-                if x in arr.keys():
-                    break
-        arr_val = arr[x]
-        if arr_val == 1:
-            print("\nYou have chosen: 1\n")
-            current_player.score -= 1
-        elif arr_val == 2:
-            print("\nYou have chosen: 2\n")
-            for player in players:
-                player.score -= 1
-        elif arr_val == 3:
-            print("\nYou have chosen: 3\n")
-            players[1 - players.index(current_player)].score -= 1
-        else:
-            print("\nChoose a number!\n")
-        arr.pop(x)
-    return players
 
 
 # Function to display input box for array length
@@ -199,17 +174,20 @@ def choose_algorithm(screen):
     text_rect_algorithm_choice.y -= 55
     algorithm_choice_screen.blit(text_algorithm_choice, text_rect_algorithm_choice)
     
-    # Button "MinMax"
+    # Button parameters
     button_font = pygame.font.SysFont(None, 30)
     button_width = 145
     button_height = 50
     button_margin = 20
     button_padding = 15  # Added padding between buttons
-
+    
+    # Buttons position
     button_x = (algorithm_choice_screen.get_width() - button_width) // 2
+
     button_y_minmax = text_rect_algorithm_choice.bottom + button_margin
     button_y_alphabeta = button_y_minmax + button_height + button_padding  # Adjusted position
-
+    
+    # Button "MinMax"
     text_minmax_button = button_font.render("MinMax", True, WHITE)
     text_rect_minmax_button = text_minmax_button.get_rect(center=(button_x + button_width // 2, button_y_minmax + button_height // 2))
 
@@ -253,6 +231,7 @@ def draw_squares(screen, squares):
         square_rects[x] = square_rect  # Store rectangle in dictionary with square number as key
     return square_rects
 
+# Function to run the chosen algorithm
 def computer_use_algorithm(algorithm_choice, ind):
     # Chosen algorithm
     
@@ -263,6 +242,10 @@ def computer_use_algorithm(algorithm_choice, ind):
         print("Best node:", best_node_ind)
         square = nodes[best_node_ind]['elem']
         lvl = nodes[best_node_ind]['lvl']
+
+        for i in nodes:
+            print(nodes[i])
+
         return square, lvl, best_node_ind
         
     elif algorithm_choice == "Alpha-beta":
@@ -272,10 +255,30 @@ def computer_use_algorithm(algorithm_choice, ind):
         print("Best node:", best_node_ind)
         square = nodes[best_node_ind]['elem']
         lvl = nodes[best_node_ind]['lvl']
+
+        for i in nodes:
+            print(nodes[i])
+
         return square, lvl, best_node_ind
 
     # Initialize the global variables
 
+# Function to update player's score based on the square chosen
+def player_score_update(players, current_player, game_array, square):
+    arr_val = game_array[square]
+    if arr_val == 1:
+        print("\nYou have chosen: 1\n")
+        current_player.score -= 1
+    elif arr_val == 2:
+        print("\nYou have chosen: 2\n")
+        for player in players:
+            player.score -= 1
+    elif arr_val == 3:
+        print("\nYou have chosen: 3\n")
+        players[1 - players.index(current_player)].score -= 1
+    
+    PATH.append((square, arr_val))
+    game_array.pop(square)  # Remove the clicked square from the array
 
 # Function to run the game
 def run_game(screen):
@@ -288,9 +291,9 @@ def run_game(screen):
     ind = 0
     ind = getInd()
     growBranch(ind, 0, game_array, player1.score, player2.score, 0)
-
     for i in nodes:
         print(nodes[i])
+    global PATH
     
     starter_choice = choose_starter(screen)
     if starter_choice == "Computer":
@@ -319,65 +322,39 @@ def run_game(screen):
                     if square_rect.collidepoint(mouse_pos):  # Check if mouse click occurred within the square button
                         if square in game_array:  # Check if the square number exists in the array
                             if current_player.name == "Player":
-                                arr_val = game_array[square]
-                                if arr_val == 1:
-                                    print("\nYou have chosen: 1\n")
-                                    current_player.score -= 1
-                                elif arr_val == 2:
-                                    print("\nYou have chosen: 2\n")
-                                    for player in players:
-                                        player.score -= 1
-                                elif arr_val == 3:
-                                    print("\nYou have chosen: 3\n")
-                                    players[1 - players.index(current_player)].score -= 1
                                 
-                                game_array.pop(square)  # Remove the clicked square from the array
+                                player_score_update(players, current_player, game_array, square) # Update player's score
                                 
                                 element = nodes[ind]['elem']
                                 if element == square:
                                     ind = nodes['ind']
+                                
                                 growBranch(ind, square, game_array, player1.score, player2.score, 0)
 
                                 current_player = players[1 - players.index(current_player)]  # Switch turn to the other player
 
                                 if current_player.name == "Computer":
                                     if game_array:  # Check if the game array is not empty
+                                        start_time = time.time()
                                         square, lvl, best_node_ind = computer_use_algorithm(algorithm_choice, ind)
 
-                                        arr_val = game_array[square]
-                                        if arr_val == 1:
-                                            print("\nYou have chosen: 1\n")
-                                            current_player.score -= 1
-                                        elif arr_val == 2:
-                                            print("\nYou have chosen: 2\n")
-                                            for player in players:
-                                                player.score -= 1
-                                        elif arr_val == 3:
-                                            print("\nYou have chosen: 3\n")
-                                            players[1 - players.index(current_player)].score -= 1
-                                        
-                                        game_array.pop(square)  # Remove the clicked square from the array
+                                        player_score_update(players, current_player, game_array, square) # Update player's score
+
+                                        end_time = time.time()
+                                        print("Time taken for turn:", end_time - start_time)
                                         
                                         growBranch(best_node_ind, square, game_array, player1.score, player2.score, lvl)
 
                                         current_player = players[1 - players.index(current_player)]  # Switch turn to the other player
                             
                             elif current_player.name == "Computer":
+                                start_time = time.time()
                                 square, lvl, best_node_ind = computer_use_algorithm(algorithm_choice, ind)
-
-                                arr_val = game_array[square]
-                                if arr_val == 1:
-                                    print("\nYou have chosen: 1\n")
-                                    current_player.score -= 1
-                                elif arr_val == 2:
-                                    print("\nYou have chosen: 2\n")
-                                    for player in players:
-                                        player.score -= 1
-                                elif arr_val == 3:
-                                    print("\nYou have chosen: 3\n")
-                                    players[1 - players.index(current_player)].score -= 1
                                 
-                                game_array.pop(square)  # Remove the clicked square from the array
+                                player_score_update(players, current_player, game_array, square) # Update player's score
+
+                                end_time = time.time()
+                                print("Time taken for turn:", end_time - start_time)
                                 
                                 growBranch(best_node_ind, square, game_array, player1.score, player2.score, lvl)
 
@@ -455,6 +432,7 @@ def main():
     text_exit = font_button.render("Exit", True, WHITE)
     text_rect_exit = text_exit.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
 
+    global PATH
     start_clicked = False
 
     while True:
@@ -465,7 +443,6 @@ def main():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if text_rect_start.collidepoint(mouse_pos):
-                    ind = 0
                     start_clicked = True
                 elif text_rect_exit.collidepoint(mouse_pos):
                     pygame.quit()
@@ -474,9 +451,10 @@ def main():
         if start_clicked:
             start_clicked = False
             while True:
-                ind = 0
                 winner = run_game(screen)
-                
+                print("Winning path: ")
+                print(PATH)
+                PATH = []
                 if winner == 'restart':
                     break
                 display_winner(screen, winner)
