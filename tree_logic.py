@@ -1,22 +1,19 @@
-# from value_arrays import value_array_5
-
-
-# A_B_scores = {"A":50,"B":50}
+# Globalie mainīgie
 g_index = 0
 nodes = {}
 
-# Get the index of the child
+# Dabūt pēcteča indeksu
 def getInd():
     global g_index
     g_index += 1 
     return g_index
 
-# Calculate the rating of the child
+# Saskaitīt pēcteču vērtējumu
 def calcRating(A_score, B_score, count_1, count_3):
     
     return A_score - B_score + count_1 - count_3
 
-# Count the child's score
+# Saskaitīt pēcteču rezultātu
 def count_score(A_score, B_score, val, A_or_B):
     locA = A_score
     locB = B_score
@@ -36,10 +33,9 @@ def count_score(A_score, B_score, val, A_or_B):
                 locA -= 1
     return locA, locB
     
-
+# Uzcelt koku ar visiem iespējamajiem gājieniem līdz noteiktam dziļumam
 def growBranch(ind, selKey, value_array, A_score, B_score, lvl, depth = 3):
-    # if depth < 1:
-        # return
+
     global nodes
     children = []
     rating = 0
@@ -56,43 +52,14 @@ def growBranch(ind, selKey, value_array, A_score, B_score, lvl, depth = 3):
             locArr.pop(key)
                 
             growBranch(locIndex, key, locArr, locA, locB, lvl+1, depth-1)
-    # turn = A_or_B*2 -1
-    # print("Rating: " + str(rating))
-    # print("A: " + str(A_score), "B: " + str(B_score))
+
     count_1 = sum(1 for value in value_array.values() if value == 1)
     count_3 = sum(1 for value in value_array.values() if value == 3)
     rating = calcRating(A_score, B_score, count_1, count_3)
 
     nodes.update({ind: {'ind': ind, 'elem': selKey, 'A': A_score, 'B': B_score, 'lvl': lvl, 'rating': rating, 'childs': children}})
-    
-# Choose the best branch
-# def selectBranch(curr):
-#     global nodes
-#     theNode = nodes[curr]
-#     # print(">>>>> Enter with: " + str(curr))
-#     # print()
-#     # print(theNode)
-#     locElem = 0
-#     locIndex = 0
-#     locRating = -1
-#     if len(theNode['childs']) > 0:
-#         firstChildFlag = True
-#         for childInd in theNode['childs']:
-#             childElem, childIndex, childRating = selectBranch(childInd)
-#             if firstChildFlag or locRating < childRating:
-#                 # print("    Inside " + str(theNode['ind']) + " from loc " + str(locRating)+ " to child " + str(childRating))
-#                 firstChildFlag = False
-#                 locElem = childElem
-#                 locIndex = childInd
-#                 locRating = childRating
-#     else:
-#         locElem = theNode['elem']
-#         locIndex = theNode['ind']
-#         locRating = theNode['rating']
-#     # print("<<<<< Exit with: " + str(theNode['ind']) + " | " + str(locElem) + " | " + str(locRating))
-    
-#     return locElem, locIndex, locRating
 
+# Izvēlēties labāko gājienu, izmantojot alfa-beta algoritmu
 def selectAlphaBeta(curr, alpha, beta, isMaxFlag = True):
     global nodes
     theNode = nodes[curr]
@@ -114,7 +81,7 @@ def selectAlphaBeta(curr, alpha, beta, isMaxFlag = True):
                 locRating = childRating
             else:
                 if isMaxFlag:
-                    if locRating < childRating: # Find max value. If yes, save.
+                    if locRating < childRating: # Atrast max vertibu. Ja ir, saglabāt.
                         locElem = childElem
                         locIndex = childInd
                         locRating = childRating
@@ -125,7 +92,7 @@ def selectAlphaBeta(curr, alpha, beta, isMaxFlag = True):
                         # print("Beta: " + str(beta))
                         break
                 else:
-                    if locRating > childRating: # Find min value. If yes, save.
+                    if locRating > childRating: # Atrast min vertibu. Ja ir, saglabāt.
                         locElem = childElem
                         locIndex = childInd
                         locRating = childRating
@@ -145,7 +112,7 @@ def selectAlphaBeta(curr, alpha, beta, isMaxFlag = True):
     theNode['beta'] = beta
     theNode['minF_maxT'] = isMaxFlag
     return locElem, locIndex, locRating
-
+# Izvēlēties labāko gājienu, izmantojot minimax algoritmu
 def selectMinMax(curr, isMaxFlag = True):
     global nodes
     theNode = nodes[curr]
@@ -168,12 +135,12 @@ def selectMinMax(curr, isMaxFlag = True):
                 locRating = childRating
             else:
                 if isMaxFlag:
-                    if locRating < childRating: # Find max value. If yes, save.
+                    if locRating < childRating: # Atrast max vertibu. Ja ir, saglabāt.
                         locElem = childElem
                         locIndex = childInd
                         locRating = childRating
                 else:
-                    if locRating > childRating: # Find min value. If yes, save.
+                    if locRating > childRating: # Atrast min vertibu. Ja ir, saglabāt.
                         locElem = childElem
                         locIndex = childInd
                         locRating = childRating
